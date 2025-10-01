@@ -1,1 +1,1 @@
-../../nvim/lua/config.lua
+../../nvim-code/lua/config.lua

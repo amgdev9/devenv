@@ -1,1 +1,1 @@
-../../nvim/lua/remaps.lua
+../../nvim-code/lua/remaps.lua
