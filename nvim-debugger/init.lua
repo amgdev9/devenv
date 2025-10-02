@@ -1,11 +1,5 @@
--- Common config
 require("package-manager")
-require("config")
 require("remaps")
-require("treesitter")
-require("color-scheme")
-require("finder")
-require("status-bar")
 
 require("lazy").setup({
   -- Common 
@@ -22,6 +16,13 @@ require("lazy").setup({
   { "rcarriga/nvim-dap-ui" },
   { "nvim-neotest/nvim-nio" },
 })
+
+-- Common config
+require("config")
+require("treesitter")
+require("color-scheme")
+require("finder")
+require("status-bar")
 
 -- Debugger config
 require("debugger")

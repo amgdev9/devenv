@@ -1,11 +1,5 @@
--- Common config
 require("package-manager")
-require("config")
 require("remaps")
-require("color-scheme")
-require("finder")
-require("status-bar")
-require("treesitter")
 
 require("lazy").setup({
   -- Common 
@@ -27,6 +21,13 @@ require("lazy").setup({
   { "nvim-mini/mini.diff" },
   { "neovim/nvim-lspconfig" },
 })
+
+-- Common config
+require("config")
+require("color-scheme")
+require("finder")
+require("status-bar")
+require("treesitter")
 
 -- Coding config
 require("file-explorer")
