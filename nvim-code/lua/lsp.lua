@@ -1,4 +1,5 @@
 local telescope_builtin = require("telescope.builtin")
+local lspconfig = require("lspconfig")
 
 vim.diagnostic.config({
     virtual_text = false,
@@ -23,106 +24,16 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end
 })
 
-local lsp_capabilities = {} 
+local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
 
--- Setup enabled LSP servers
-local custom_ok, custom = pcall(require, "custom")
-local enabled_lsp = custom_ok and custom.lsp or {}
-local lspconfig = require("lspconfig")
+-- Config LSPs using custom files
+local custom_files = vim.fn.readdir(vim.fn.stdpath("config") .. "/lua/custom", [[v:val =~ '\.lua$']])
 
-for k, v in pairs(enabled_lsp) do
-    local name = type(k) == "number" and v or k
-    local cmd = type(k) == "number" and "NIL" or v
-    if cmd == "NIL" then
-        cmd = nil
-    end
-
-    if name == "kotlin" then
-        local root_files = {
-            'settings.gradle', 
-            'settings.gradle.kts', 
-            'pom.xml', 
-            'build.gradle', 
-            'build.gradle.kts', 
-        }
-        vim.lsp.config['kotlin-lsp'] = {
-            filetypes = { 'kotlin' },
-            cmd = { cmd, "--stdio" }, 
-            root_markers = root_files,
-        }
-        vim.lsp.enable('kotlin-lsp')
-    elseif name == "zls" then
-        vim.g.zig_fmt_autosave = 0
-        lspconfig.zls.setup({
-            capabilities = lsp_capabilities,
-        })
-    elseif name == "rust_analyzer" then
-        lspconfig.rust_analyzer.setup({
-            capabilities = lsp_capabilities,
-            settings = {
-                ["rust-analyzer"] = {
-                    imports = {
-                        granularity = {
-                            group = "module",
-                        },
-                        prefix = "self",
-                    },
-                    cargo = {
-                        buildScripts = {
-                            enable = true,
-                        },
-                        targetDir = true,
-                    },
-                    procMacro = {
-                        enable = true
-                    },
-                }
-            }
-        })
-    elseif name == "pylsp" then
-        lspconfig.pylsp.setup({
-            capabilities = lsp_capabilities,
-            settings = {
-                pylsp = {
-                    plugins = {
-                        pycodestyle = { enabled = false },
-                        flake8 = { enabled = false },
-                        pylint = { enabled = false }
-                    }
-                }
-            }
-        })
-    elseif name == "sourcekit" then
-        lspconfig.sourcekit.setup({
-            capabilities = lsp_capabilities,
-            filetypes = { "swift", "objc", "objcpp", "c", "cpp" },
-            on_init = function(client, initialization_result)
-                -- HACK: to fix some issues with LSP
-                -- more details: https://github.com/neovim/neovim/issues/19237#issuecomment-2237037154
-                client.offset_encoding = "utf-8"
-            end,
-            get_language_id = function(_, ftype)
-                if ftype == "objc" then
-                    return "objective-c"
-                end
-                if ftype == "objcpp" then
-                    return "objective-cpp"
-                end
-                return ftype
-            end,
-        })
-    else
-        if cmd ~= nil then
-            lspconfig[name].setup({
-                capabilities = lsp_capabilities,
-                cmd = cmd
-            })
-        else
-            lspconfig[name].setup({
-                capabilities = lsp_capabilities
-            })
-        end
-    end
+for _, file in ipairs(custom_files) do
+  local mod = require("custom." .. file:gsub("%.lua$", ""))
+  if mod.setup_lsp then
+    mod.setup_lsp(lspconfig, lsp_capabilities)
+  end
 end
 
 -- Progress indicator
