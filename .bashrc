@@ -1,4 +1,4 @@
-source /etc/bash-completion.d/git-prompt
+source /etc/bash_completion.d/git-prompt
 
 export PATH=$PATH:$HOME/devenvs/scripts
 
