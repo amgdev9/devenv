@@ -1,5 +1,4 @@
 local telescope_builtin = require("telescope.builtin")
-local lspconfig = require("lspconfig")
 
 vim.diagnostic.config({
     virtual_text = false,
@@ -32,7 +31,7 @@ local custom_files = vim.fn.readdir(vim.fn.stdpath("config") .. "/lua/custom", [
 for _, file in ipairs(custom_files) do
   local mod = require("custom." .. file:gsub("%.lua$", ""))
   if mod.setup_lsp then
-    mod.setup_lsp(lspconfig, lsp_capabilities)
+    mod.setup_lsp(lsp_capabilities)
   end
 end
 
