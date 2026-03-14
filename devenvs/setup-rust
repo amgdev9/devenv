@@ -1,0 +1,17 @@
+#!/bin/bash
+su - amgdev -c "curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y"
+su - amgdev -c "rustup component add rust-analyzer"
+cat <<EOF > /home/amgdev/.config/nvim-code/lua/custom/rust.lua
+local M = {}
+
+function M.setup_lsp(capabilities)
+  vim.lsp.config("rust_analyzer", { capabilities = capabilities })
+  vim.lsp.enable("rust_analyzer")
+end
+
+function M.get_formatters_by_ft()
+  return {}
+end
+
+return M
+EOF

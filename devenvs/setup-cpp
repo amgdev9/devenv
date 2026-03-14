@@ -1,0 +1,16 @@
+#!/bin/bash
+apt-get install -y clang clangd
+cat <<EOF > /home/amgdev/.config/nvim-code/lua/custom/cpp.lua
+local M = {}
+
+function M.setup_lsp(capabilities)
+  vim.lsp.config("clangd", { capabilities = capabilities })
+  vim.lsp.enable("clangd")
+end
+
+function M.get_formatters_by_ft()
+  return {}
+end
+
+return M
+EOF
