@@ -12,9 +12,23 @@ su - amgdev <<'EOF'
     echo 'export ANDROID_HOME=$HOME/android-sdk' >> ~/.bashrc
     echo 'export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin' >> ~/.bashrc
     echo 'export PATH=$PATH:$ANDROID_HOME/platform-tools' >> ~/.bashrc
-
+    
     yes | ~/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
     ~/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools"
+
+    curl -O https://download-cdn.jetbrains.com/kotlin-lsp/262.1817.0/kotlin-lsp-262.1817.0-linux-x64.zip
+    unzip kotlin-lsp-262.1817.0-linux-x64.zip -d .kotlin-lsp 
+    rm kotlin-lsp-262.1817.0-linux-x64.zip
+    chmod u+x .kotlin-lsp/kotlin-lsp.sh
+    mv .kotlin-lsp/kotlin-lsp.sh .kotlin-lsp/kotlin-lsp
+    echo 'export PATH=$PATH:$HOME/.kotlin-lsp' >> ~/.bashrc
+EOF
+su - amgdev <<'EOF'
+    git clone https://github.com/yamsergey/yamsergey.dta.git
+    cd yamsergey.dta
+    ./gradlew :dta-cli:installDist
+    cd ..
+    echo 'export PATH=$PATH:$HOME/yamsergey.dta/dta-cli/build/install/dta-cli/bin' >> ~/.bashrc
 EOF
 cat <<EOF > /home/amgdev/.config/nvim-code/lua/custom/kotlin.lua
 local M = {}
@@ -30,4 +44,3 @@ end
 
 return M
 EOF
-
