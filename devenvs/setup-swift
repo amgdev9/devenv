@@ -6,7 +6,6 @@ su - amgdev <<'EOF'
     tar zxf swiftly-$(uname -m).tar.gz
     rm swiftly-$(uname -m).tar.gz
     ./swiftly init --quiet-shell-followup -y --platform debian12
-    rm swiftly
     chmod u+x $HOME/.local/share/swiftly/env.sh
     echo ". $HOME/.local/share/swiftly/env.sh" >> $HOME/.bashrc
     mkdir -p $HOME/.config/nvim-code/lua/custom
