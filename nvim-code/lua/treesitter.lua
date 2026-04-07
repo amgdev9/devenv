@@ -1,13 +1,10 @@
+parsers = require('nvim-treesitter.parsers')
+parsers['typescriptreact'] = parsers['tsx']
+
 vim.api.nvim_create_autocmd({ 'Filetype' }, {
   callback = function(event)
-    -- make sure nvim-treesitter is loaded
     local ok, nvim_treesitter = pcall(require, 'nvim-treesitter')
-
-    -- no nvim-treesitter, maybe fresh install
     if not ok then return end
-
-    local parsers = require('nvim-treesitter.parsers')
-
     if not parsers[event.match] or not nvim_treesitter.install then return end
 
     local ft = vim.bo[event.buf].ft
