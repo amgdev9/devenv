@@ -18,3 +18,10 @@ vim.keymap.set("n", "<leader>e", function()
         oil.open()      
     end
 end)
+
+vim.keymap.set("n", "<leader>c", function()
+    local path = vim.fn.expand("%"):gsub("oil://", "")
+    path = vim.fn.fnamemodify(path, ":.")
+    vim.fn.setreg("+", path)
+    vim.notify("Copied: " .. path)
+end)
