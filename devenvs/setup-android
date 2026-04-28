@@ -2,11 +2,12 @@
 apt-get install -y unzip openjdk-21-jdk
 su - amgdev <<'EOF'
     curl -o kotlinlsp.tar.gz https://download-cdn.jetbrains.com/kotlin-lsp/262.4739.0/kotlin-server-262.4739.0.tar.gz
+    mkdir .kotlin-lsp
     tar -xzf kotlinlsp.tar.gz -C .kotlin-lsp 
     rm kotlinlsp.tar.gz
-    chmod u+x .kotlin-lsp/bin/intellij-server
-    mv .kotlin-lsp/bin/intellij-server .kotlin-lsp/bin/kotlin-lsp
-    echo 'export PATH=$PATH:$HOME/.kotlin-lsp/bin' >> ~/.bashrc
+    chmod u+x .kotlin-lsp/kotlin-server-262.4739.0/bin/intellij-server
+    mv .kotlin-lsp/kotlin-server-262.4739.0/bin/intellij-server .kotlin-lsp/kotlin-server-262.4739.0/bin/kotlin-lsp
+    echo 'export PATH=$PATH:$HOME/.kotlin-lsp/kotlin-server-262.4739.0/bin' >> ~/.bashrc
 
     curl -o cmdtools.zip https://dl.google.com/android/repository/commandlinetools-linux-14742923_latest.zip
     unzip cmdtools.zip 
