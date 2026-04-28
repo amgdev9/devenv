@@ -10,6 +10,7 @@ require("lazy").setup({
   { "rktjmp/lush.nvim" },
   { "rockyzhang24/arctic.nvim" },
   { "nvim-lua/plenary.nvim" },
+  { "stevearc/oil.nvim" },
 
   -- Debugger
   { "mfussenegger/nvim-dap" },
@@ -23,6 +24,7 @@ require("treesitter")
 require("color-scheme")
 require("finder")
 require("status-bar")
+require("file-explorer")
 
 -- Debugger config
 require("debugger")

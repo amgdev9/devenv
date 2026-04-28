@@ -10,10 +10,10 @@ require("lazy").setup({
   { "rktjmp/lush.nvim" },
   { "rockyzhang24/arctic.nvim" },
   { "nvim-lua/plenary.nvim" },
+  { "stevearc/oil.nvim" },
 
   -- Coding
   { "Exafunction/windsurf.nvim" },
-  { "stevearc/oil.nvim" },
   { "stevearc/conform.nvim" },
   { "ThePrimeagen/harpoon", branch = "harpoon2" },
   { "hrsh7th/nvim-cmp" },
@@ -28,9 +28,9 @@ require("color-scheme")
 require("finder")
 require("status-bar")
 require("treesitter")
+require("file-explorer")
 
 -- Coding config
-require("file-explorer")
 require("git-gutter")
 require("ai")
 require("format")
