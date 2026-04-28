@@ -94,3 +94,14 @@ vim.api.nvim_create_autocmd("BufEnter", {
 })
 
 vim.schedule(set_all_buffers_readonly)
+
+-- Config DAPs using custom files
+local custom_files = vim.fn.readdir(vim.fn.stdpath("config") .. "/lua/custom", [[v:val =~ '\.lua$']])
+
+for _, file in ipairs(custom_files) do
+  local mod = require("custom." .. file:gsub("%.lua$", ""))
+  if mod.setup_dap then
+    mod.setup_dap(dap)
+  end
+end
+
