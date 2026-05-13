@@ -23,6 +23,9 @@ nvim_tree.setup({
             quit_on_open = true,
         },
     },
+    git = {
+        enable = false,
+    },
 })
 
 vim.keymap.set('n', "<leader>e", function()
