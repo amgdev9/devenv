@@ -1,5 +1,7 @@
 local telescope_builtin = require("telescope.builtin")
 
+require("lsp-file-operations").setup()
+
 vim.diagnostic.config({
     virtual_text = false,
     virtual_lines = false,

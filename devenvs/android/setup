@@ -1,4 +1,5 @@
 #!/bin/bash
+cd "$(dirname "$0")"
 apt-get install -y unzip openjdk-21-jdk
 su - amgdev <<'EOF'
     curl -o kotlinlsp.tar.gz https://download-cdn.jetbrains.com/kotlin-lsp/262.4739.0/kotlin-server-262.4739.0.tar.gz
@@ -28,17 +29,8 @@ su - amgdev <<'EOF'
     chmod u+x android
     mv android ~/android-sdk/cmdline-tools/latest/bin  
 EOF
-cat <<EOF > /home/amgdev/.config/nvim-code/lua/custom/kotlin.lua
-local M = {}
+cp lsp.lua /home/amgdev/.config/nvim-code/lua/custom/kotlin.lua 
+chown -R amgdev:amgdev /home/amgdev/.config/nvim-code/lua/custom/kotlin.lua 
+cp debug.lua /home/amgdev/.config/nvim-debugger/lua/custom/android.lua
+chown -R amgdev:amgdev /home/amgdev/.config/nvim-debugger/lua/custom/android.lua
 
-function M.setup_lsp(capabilities)
-  vim.lsp.config("kotlin_lsp", { capabilities = capabilities })
-  vim.lsp.enable("kotlin_lsp")
-end
-
-function M.get_formatters_by_ft()
-  return {}
-end
-
-return M
-EOF

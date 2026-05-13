@@ -1,27 +1,53 @@
-local oil = require("oil")
-oil.setup({
-    skip_confirm_for_simple_edits = false,
-    keymaps = {
-        ["<CR>"] = "actions.select",
-        ["-"] = { "actions.parent", mode = "n" },
+local nvim_tree = require("nvim-tree")
+local api = require("nvim-tree.api")
+
+local function on_attach(bufnr)
+    local api = require("nvim-tree.api")
+
+    local function opts(desc)
+        return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+    end
+
+    api.config.mappings.default_on_attach(bufnr)
+
+    vim.keymap.set('n', 'f', api.tree.change_root_to_node, opts('Change Root'))
+end
+
+nvim_tree.setup({
+    on_attach = on_attach,
+    view = {
+        width = "100%",
     },
-    use_default_keymaps = false,
-    view_options = {
-        show_hidden = true,
-    }   
+    actions = {
+        open_file = {
+            quit_on_open = true,
+        },
+    },
+    git = {
+        enable = false,
+    },
 })
 
-vim.keymap.set("n", "<leader>e", function() 
-    if vim.bo.filetype == "oil" then
-        oil.close()
-    else
-        oil.open()      
+vim.keymap.set('n', "<leader>e", function()
+    api.tree.toggle({ find_file = true }) 
+    if api.tree.is_visible() then
+        api.tree.change_root_to_node(api.tree.get_node_under_cursor())
     end
 end)
 
 vim.keymap.set("n", "<leader>c", function()
-    local path = vim.fn.expand("%"):gsub("oil://", "")
-    path = vim.fn.fnamemodify(path, ":.")
-    vim.fn.setreg("+", path)
-    vim.notify("Copied: " .. path)
-end)
+    local path
+    local node = api.tree.get_node_under_cursor()
+
+    if vim.bo.filetype == "NvimTree" and node then
+        path = node.absolute_path
+    else
+        path = vim.fn.expand("%:p")
+    end
+
+    if path and path ~= "" then
+        path = vim.fn.fnamemodify(path, ":.")
+        vim.fn.setreg("+", path)
+        vim.notify("Copied: " .. path)
+    end
+end, { desc = "Copy relative path" })

@@ -1,0 +1,4 @@
+cd "$(dirname "$0")"
+
+source ../setup_nodejs
+cp debug.lua /home/amgdev/.config/nvim-debugger/lua/custom/react-native.lua 

@@ -10,7 +10,7 @@ require("lazy").setup({
   { "rktjmp/lush.nvim" },
   { "rockyzhang24/arctic.nvim" },
   { "nvim-lua/plenary.nvim" },
-  { "stevearc/oil.nvim" },
+  { "nvim-tree/nvim-tree.lua" },
 
   -- Debugger
   { "mfussenegger/nvim-dap" },
