@@ -1,5 +1,8 @@
 local dap, dapui = require("dap"), require("dapui")
 
+-- Disable LSP info 
+vim.diagnostic.enable(false)
+
 dapui.setup({
     controls = {
         element = "repl",
@@ -103,5 +106,11 @@ for _, file in ipairs(custom_files) do
   if mod.setup_dap then
     mod.setup_dap(dap)
   end
+end
+
+dap.listeners.on_session["ok-message"] = function(old, new)
+    if new then
+      print("DAP Session established!")
+    end
 end
 
