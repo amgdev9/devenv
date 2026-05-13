@@ -10,9 +10,10 @@ require("lazy").setup({
   { "rktjmp/lush.nvim" },
   { "rockyzhang24/arctic.nvim" },
   { "nvim-lua/plenary.nvim" },
-  { "stevearc/oil.nvim" },
+  { "nvim-tree/nvim-tree.lua" },
 
   -- Coding
+  { "antosha417/nvim-lsp-file-operations" },
   { "Exafunction/windsurf.nvim" },
   { "stevearc/conform.nvim" },
   { "ThePrimeagen/harpoon", branch = "harpoon2" },
