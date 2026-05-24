@@ -174,10 +174,19 @@ if args.command == "metro":
 
 if args.command == "talkback":
     action = args.action
+
     if action == "on":
-        subprocess.run("adb shell settings put secure enabled_accessibility_services com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService", check=True)
+        subprocess.run([
+            "adb", "shell", "settings", "put", "secure", 
+            "enabled_accessibility_services", 
+            "com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService"
+        ], check=True)
+    
     elif action == "off":
-        subprocess.run("adb shell settings put secure enabled_accessibility_services null", check=True)
+        subprocess.run([
+            "adb", "shell", "settings", "put", "secure", 
+            "enabled_accessibility_services", "null"
+        ], check=True)
     sys.exit(0)
 
 if args.command == "sms":

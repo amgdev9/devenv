@@ -6,6 +6,7 @@ import json
 import shutil
 import os
 import glob
+from pathlib import Path
 
 parser = argparse.ArgumentParser(description="iOS Development CLI")
 subparsers = parser.add_subparsers(dest="command")
@@ -107,18 +108,15 @@ if args.command == "run":
         subprocess.run(["open", "-a", "Simulator"], check=True)
 
     sdk = "iphonesimulator" if is_simulator else "iphoneos"
-    xcode_cmd = f"xcodebuild -scheme {scheme} -sdk {sdk} -showBuildSettings"
+    xcode_cmd = f"xcodebuild -scheme {scheme} -sdk {sdk} -showBuildSettings -dry-run"
     result = subprocess.check_output(xcode_cmd, shell=True, text=True)
     
     build_dir = next(
         (line.split("=")[1].strip() for line in result.splitlines() if "TARGET_BUILD_DIR =" in line), 
         None
     )
-
-    bundle_id_cmd = f"xcodebuild -scheme {scheme} -sdk {sdk} -showBuildSettings"
-    bundle_id_result = subprocess.check_output(bundle_id_cmd, shell=True, text=True)
     bundle_id = next(
-        (line.split("=")[1].strip() for line in bundle_id_result.splitlines() if " PRODUCT_BUNDLE_IDENTIFIER =" in line),
+        (line.split("=")[1].strip() for line in result.splitlines() if " PRODUCT_BUNDLE_IDENTIFIER =" in line),
         None
     )
 
