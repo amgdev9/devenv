@@ -6,6 +6,7 @@ import json
 import shutil
 import os
 import glob
+import time
 from pathlib import Path
 
 parser = argparse.ArgumentParser(description="iOS Development CLI")
@@ -34,19 +35,69 @@ iphone_name_parser = subparsers.add_parser("iphone-name", help="Get the name of 
 
 args = parser.parse_args()
 
-def load_config():
+def _find_ios_dir():
     curr = Path.cwd().resolve()
     home = Path.home()
     while True:
-        path = curr / ".ios/config.json"
-        if path.exists():
-            return json.loads(path.read_text())
+        path = curr / ".ios"
+        if (path / "config.json").exists():
+            return path
         if curr == home or curr == curr.parent:
             raise FileNotFoundError("Config not found.")
         curr = curr.parent
 
+
+def load_config(refresh_cache=False):
+    ios_dir = _find_ios_dir()
+    config = json.loads((ios_dir / "config.json").read_text())
+    if refresh_cache:
+        _refresh_build_settings_cache(ios_dir, config)
+    return config
+
+
+def _refresh_build_settings_cache(ios_dir, config):
+    cache_path = ios_dir / "cache.json"
+    config_path = ios_dir / "config.json"
+
+    config_mtime = config_path.stat().st_mtime
+    
+    if cache_path.exists():
+        try:
+            cache = json.loads(cache_path.read_text())
+            if cache.get("config_mtime") == config_mtime:
+                return
+        except json.JSONDecodeError:
+            pass
+
+    scheme = config["scheme"]
+    is_simulator = config["device"] == "simulator"
+    sdk = "iphonesimulator" if is_simulator else "iphoneos"
+
+    try:
+        print("Refreshing build settings cache as config.json has changed...")
+        xcode_cmd = f"xcodebuild -scheme {scheme} -sdk {sdk} -showBuildSettings"
+        result = subprocess.check_output(xcode_cmd, shell=True, text=True, stderr=subprocess.DEVNULL)
+    except subprocess.CalledProcessError:
+        return
+
+    def extract_setting(key):
+        for line in result.splitlines():
+            stripped = line.strip()
+            if stripped.startswith(key + " ="):
+                return stripped.split("=", 1)[1].strip()
+        return None
+
+    cache = {
+        "config_mtime": config_mtime,
+        "TARGET_BUILD_DIR": extract_setting("TARGET_BUILD_DIR"),
+        "PRODUCT_BUNDLE_IDENTIFIER": extract_setting("PRODUCT_BUNDLE_IDENTIFIER"),
+        "TARGET_NAME": extract_setting("TARGET_NAME"),
+    }
+
+    cache_path.write_text(json.dumps(cache, indent=4))
+
 def build():
-    jsonfile = load_config()
+    jsonfile = load_config(refresh_cache=True)
     scheme = jsonfile["scheme"]
     is_simulator = jsonfile["device"] == "simulator"
     
@@ -98,7 +149,7 @@ if args.command == "a11":
     sys.exit(0)
 
 if args.command == "run":
-    jsonfile = load_config()
+    jsonfile = load_config(refresh_cache=True)
     scheme = jsonfile["scheme"]
     is_simulator = jsonfile["device"] == "simulator"
     iphone_name = jsonfile["device"]
@@ -106,29 +157,24 @@ if args.command == "run":
 
     if is_simulator:
         subprocess.run(["open", "-a", "Simulator"], check=True)
+        while True:
+            res = subprocess.run(["xcrun", "simctl", "list", "devices"], capture_output=True, text=True)
+            if "Booted" in res.stdout: break
+            time.sleep(1)
 
-    sdk = "iphonesimulator" if is_simulator else "iphoneos"
-    xcode_cmd = f"xcodebuild -scheme {scheme} -sdk {sdk} -showBuildSettings -dry-run"
-    result = subprocess.check_output(xcode_cmd, shell=True, text=True)
-    
-    build_dir = next(
-        (line.split("=")[1].strip() for line in result.splitlines() if "TARGET_BUILD_DIR =" in line), 
-        None
-    )
-    bundle_id = next(
-        (line.split("=")[1].strip() for line in result.splitlines() if " PRODUCT_BUNDLE_IDENTIFIER =" in line),
-        None
-    )
+    ios_dir = _find_ios_dir()
+    cache = json.loads((ios_dir / "cache.json").read_text())
+    build_dir = cache.get("TARGET_BUILD_DIR")
+    bundle_id = cache.get("PRODUCT_BUNDLE_IDENTIFIER")
 
     if build_dir and bundle_id:
         app_paths = glob.glob(os.path.join(build_dir, "*.app"))
-        if app_paths[0]:
-            if is_simulator:
-                subprocess.run(["xcrun", "simctl", "install", "booted", app_paths[0]], check=True)
-                subprocess.run(["xcrun", "simctl", "launch", "booted", bundle_id], check=True)
-            else:
-                subprocess.run(["xcrun", "devicectl", "device", "install", "app", "--device", iphone_name, app_paths[0]], check=True)
-                subprocess.run(["xcrun", "devicectl", "device", "process", "launch", "--device", iphone_name, bundle_id], check=True)
+        if is_simulator:
+            subprocess.run(["xcrun", "simctl", "install", "booted", app_paths[0]], check=True)
+            subprocess.run(["xcrun", "simctl", "launch", "booted", bundle_id], check=True)
+        else:
+            subprocess.run(["xcrun", "devicectl", "device", "install", "app", "--device", iphone_name, app_paths[0]], check=True)
+            subprocess.run(["xcrun", "devicectl", "device", "process", "launch", "--device", iphone_name, bundle_id], check=True)
     sys.exit(0)
 
 if args.command == "deeplink":
@@ -156,21 +202,11 @@ if args.command == "logs":
         pass
 
 if args.command == "exec-path":
-    jsonfile = load_config()
-    scheme = jsonfile["scheme"]
-    is_simulator = jsonfile["device"] == "simulator"
-    sdk = "iphonesimulator" if is_simulator else "iphoneos"
-    xcode_cmd = f"xcodebuild -scheme {scheme} -sdk {sdk} -showBuildSettings"
-    result = subprocess.check_output(xcode_cmd, shell=True, text=True, stderr=subprocess.DEVNULL)
-    
-    build_dir = next(
-        (line.split("=")[1].strip() for line in result.splitlines() if "TARGET_BUILD_DIR =" in line), 
-        None
-    )
-    exec_name = next(
-        (line.split("=")[1].strip() for line in result.splitlines() if "TARGET_NAME =" in line), 
-        None
-    )
+    jsonfile = load_config(refresh_cache=True)
+    ios_dir = _find_ios_dir()
+    cache = json.loads((ios_dir / "cache.json").read_text())
+    build_dir = cache.get("TARGET_BUILD_DIR")
+    exec_name = cache.get("TARGET_NAME")
     print(f"{build_dir}/{exec_name}.app")
     sys.exit(0)
 
