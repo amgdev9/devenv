@@ -106,11 +106,11 @@ if args.command == "config":
     os.makedirs(".android")
     app_module = input("App Module (:app): ").strip() or ":app"
     flavor = input("Flavor (optional): ").strip()
-    launch_activity = input("Launch Activity (optional): ").strip()
+    launch_activity = input("Launch Activity: ").strip()
     device = input("Device (emulator/android): ").strip() or "emulator"
     
     with open('.android/config.json', 'w', encoding='utf-8') as f:
-        json.dump({"module": app_module, "flavor": flavor, "launchActivity": launch_activity, "device": device }, f, indent=4)
+        json.dump({"module": app_module, "flavor": flavor, "launchActivity": launch_activity, "device": device, "launchParams": "" }, f, indent=4)
 
     build()
     sys.exit(0)
@@ -125,6 +125,7 @@ if args.command == "run":
     flavor = jsonfile["flavor"]
     launch_activity = jsonfile["launchActivity"]
     is_emulator = jsonfile["device"] == "emulator"
+    launch_params = jsonfile["launchParams"]
 
     print(f"Running module={module}, flavor={flavor}...")
 
@@ -144,12 +145,11 @@ if args.command == "run":
     print(f"Installing {apk_path} ({package_name}) on {arch} device...")
     
     subprocess.run(["adb", "install", "--fastdeploy", apk_path], check=True)
-
-    if launch_activity != "":
-        subprocess.run(f"adb shell am start -n {package_name}/{launch_activity}", shell=True, check=True)
+    if launch_params != "":
+        subprocess.run(f"adb shell am start -n {package_name}/{launch_activity} {launch_params}", shell=True, check=True)
     else:
-        subprocess.run(f"adb shell monkey -p {package_name} -c android.intent.category.LAUNCHER 1", shell=True, check=True)
-
+        subprocess.run(f"adb shell am start -n {package_name}/{launch_activity}", shell=True, check=True)
+    
     sys.exit(0)
 
 if args.command == "deeplink":

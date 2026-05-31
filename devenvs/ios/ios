@@ -114,7 +114,7 @@ if args.command == "config":
     scheme = input("Scheme: ")
 
     with open('.ios/config.json', 'w', encoding='utf-8') as f:
-        json.dump({"scheme": scheme, "device": "simulator" }, f, indent=4)
+        json.dump({"scheme": scheme, "device": "simulator", "launchParams": [] }, f, indent=4)
 
     subprocess.run(["xcode-build-server", "config", "-scheme", scheme], check=True)
     build()
@@ -152,6 +152,7 @@ if args.command == "run":
     jsonfile = load_config(refresh_cache=True)
     scheme = jsonfile["scheme"]
     is_simulator = jsonfile["device"] == "simulator"
+    launch_params = jsonfile["launchParams"] or []
     iphone_name = jsonfile["device"]
     print(f"Running scheme={scheme} on device={jsonfile['device']}...")
 
@@ -171,10 +172,15 @@ if args.command == "run":
         app_paths = glob.glob(os.path.join(build_dir, "*.app"))
         if is_simulator:
             subprocess.run(["xcrun", "simctl", "install", "booted", app_paths[0]], check=True)
-            subprocess.run(["xcrun", "simctl", "launch", "booted", bundle_id], check=True)
+            command = ["xcrun", "simctl", "launch", "booted", bundle_id]
+            command.extend(launch_params)
+            subprocess.run(command, check=True)
         else:
             subprocess.run(["xcrun", "devicectl", "device", "install", "app", "--device", iphone_name, app_paths[0]], check=True)
-            subprocess.run(["xcrun", "devicectl", "device", "process", "launch", "--device", iphone_name, bundle_id], check=True)
+            command = ["xcrun", "devicectl", "device", "launch", "--device", iphone_name, bundle_id]
+            for arg in launch_params:
+                command.extend(["--argument", arg])
+            subprocess.run(command, check=True)
     sys.exit(0)
 
 if args.command == "deeplink":
