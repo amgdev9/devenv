@@ -57,14 +57,13 @@ def load_config(refresh_cache=False):
 
 def _refresh_build_settings_cache(ios_dir, config):
     cache_path = ios_dir / "cache.json"
-    config_path = ios_dir / "config.json"
 
-    config_mtime = config_path.stat().st_mtime
+    config_values = {k: v for k, v in config.items() if k != "launchParams"}
     
     if cache_path.exists():
         try:
             cache = json.loads(cache_path.read_text())
-            if cache.get("config_mtime") == config_mtime:
+            if cache.get("config_values") == config_values:
                 return
         except json.JSONDecodeError:
             pass
@@ -88,7 +87,7 @@ def _refresh_build_settings_cache(ios_dir, config):
         return None
 
     cache = {
-        "config_mtime": config_mtime,
+        "config_values": config_values,
         "TARGET_BUILD_DIR": extract_setting("TARGET_BUILD_DIR"),
         "PRODUCT_BUNDLE_IDENTIFIER": extract_setting("PRODUCT_BUNDLE_IDENTIFIER"),
     }
