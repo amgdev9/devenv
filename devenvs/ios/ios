@@ -91,7 +91,6 @@ def _refresh_build_settings_cache(ios_dir, config):
         "config_mtime": config_mtime,
         "TARGET_BUILD_DIR": extract_setting("TARGET_BUILD_DIR"),
         "PRODUCT_BUNDLE_IDENTIFIER": extract_setting("PRODUCT_BUNDLE_IDENTIFIER"),
-        "TARGET_NAME": extract_setting("TARGET_NAME"),
     }
 
     cache_path.write_text(json.dumps(cache, indent=4))
@@ -167,20 +166,19 @@ if args.command == "run":
     cache = json.loads((ios_dir / "cache.json").read_text())
     build_dir = cache.get("TARGET_BUILD_DIR")
     bundle_id = cache.get("PRODUCT_BUNDLE_IDENTIFIER")
+    app_path = glob.glob(os.path.join(build_dir, "*.app"))[0]
 
-    if build_dir and bundle_id:
-        app_paths = glob.glob(os.path.join(build_dir, "*.app"))
-        if is_simulator:
-            subprocess.run(["xcrun", "simctl", "install", "booted", app_paths[0]], check=True)
-            command = ["xcrun", "simctl", "launch", "booted", bundle_id]
-            command.extend(launch_params)
-            subprocess.run(command, check=True)
-        else:
-            subprocess.run(["xcrun", "devicectl", "device", "install", "app", "--device", iphone_name, app_paths[0]], check=True)
-            command = ["xcrun", "devicectl", "device", "launch", "--device", iphone_name, bundle_id]
-            for arg in launch_params:
-                command.extend(["--argument", arg])
-            subprocess.run(command, check=True)
+    if is_simulator:
+        subprocess.run(["xcrun", "simctl", "install", "booted", app_path], check=True)
+        command = ["xcrun", "simctl", "launch", "booted", bundle_id]
+        command.extend(launch_params)
+        subprocess.run(command, check=True)
+    else:
+        subprocess.run(["xcrun", "devicectl", "device", "install", "app", "--device", iphone_name, app_path], check=True)
+        command = ["xcrun", "devicectl", "device", "launch", "--device", iphone_name, bundle_id]
+        for arg in launch_params:
+            command.extend(["--argument", arg])
+        subprocess.run(command, check=True)
     sys.exit(0)
 
 if args.command == "deeplink":
@@ -212,8 +210,8 @@ if args.command == "exec-path":
     ios_dir = _find_ios_dir()
     cache = json.loads((ios_dir / "cache.json").read_text())
     build_dir = cache.get("TARGET_BUILD_DIR")
-    exec_name = cache.get("TARGET_NAME")
-    print(f"{build_dir}/{exec_name}.app")
+    app_path = glob.glob(os.path.join(build_dir, "*.app"))[0]
+    print(app_path)
     sys.exit(0)
 
 if args.command == "iphone-name":
