@@ -1,2 +1,0 @@
-- Leader + a: if telescope is opened, add results to harpoon
-- Leader + a: if nvim-tree is opened, add selected file to harpoon

@@ -1,11 +1,24 @@
 local harpoon = require("harpoon")
+local api = require("nvim-tree.api")
 
 harpoon:setup()
 
 vim.keymap.set("n", "<leader>a", function()
-    harpoon:list():add()
-    local file_path = vim.fn.expand("%:.")
-    vim.notify("Added to Harpoon: " .. file_path, vim.log.levels.INFO)
+    local path
+
+    if vim.bo.filetype == "NvimTree" then
+        local node = api.tree.get_node_under_cursor()
+        path = node.absolute_path
+    else
+        path = vim.fn.expand("%:p")
+    end
+
+    if path and path ~= "" then
+        path = vim.fn.fnamemodify(path, ":.")
+        item = { value = path, context = { row = 1, col = 0} }
+        harpoon:list():add(item)
+        vim.notify("Added to Harpoon: " .. path)
+    end
 end)
 vim.keymap.set("n", "<leader>h", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
 vim.keymap.set("n", "<leader>1", function() harpoon:list():select(1) end)
