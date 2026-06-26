@@ -1,6 +1,7 @@
 source /etc/bash_completion.d/git-prompt
 
 export PATH=$PATH:$HOME/devenv/scripts
+export PATH=$PATH:$HOME/.bin
 
 # Avoids terminal bugs when using containers
 export TERM=tmux-256color
