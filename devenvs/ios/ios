@@ -28,6 +28,8 @@ run_parser = subparsers.add_parser("run", help="Install and launch the app on th
 deeplink_parser = subparsers.add_parser("deeplink", help="Open a specific URL scheme or universal link")
 deeplink_parser.add_argument("url", help="The URL to open")
 
+new_parser = subparsers.add_parser("new", help="Generate a new iOS project using xcodegen")
+
 logs_parser = subparsers.add_parser("logs", help="Stream live console output from the simulator")
 
 exec_path_parser = subparsers.add_parser("exec-path", help="Get app executable path")
@@ -76,6 +78,7 @@ def _refresh_build_settings_cache(ios_dir, config):
         print("Refreshing build settings cache as config.json has changed...")
         xcode_cmd = f"xcodebuild -scheme {scheme} -sdk {sdk} -showBuildSettings"
         result = subprocess.check_output(xcode_cmd, shell=True, text=True, stderr=subprocess.DEVNULL)
+        subprocess.run(["xcode-build-server", "config", "-scheme", scheme], check=True)
     except subprocess.CalledProcessError:
         return
 
@@ -114,7 +117,6 @@ if args.command == "config":
     with open('.ios/config.json', 'w', encoding='utf-8') as f:
         json.dump({"scheme": scheme, "device": "simulator", "launchParams": [] }, f, indent=4)
 
-    subprocess.run(["xcode-build-server", "config", "-scheme", scheme], check=True)
     build()
     sys.exit(0)
 
@@ -174,7 +176,7 @@ if args.command == "run":
         subprocess.run(command, check=True)
     else:
         subprocess.run(["xcrun", "devicectl", "device", "install", "app", "--device", iphone_name, app_path], check=True)
-        command = ["xcrun", "devicectl", "device", "launch", "--device", iphone_name, bundle_id]
+        command = ["xcrun", "devicectl", "device", "process", "launch", "--device", iphone_name, bundle_id]
         for arg in launch_params:
             command.extend(["--argument", arg])
         subprocess.run(command, check=True)
@@ -219,8 +221,60 @@ if args.command == "iphone-name":
     print(device)
     sys.exit(0)
 
+if args.command == "new":
+    project_yml = """name: TestApp
+targets:
+  TestApp:
+    type: application
+    platform: iOS
+    deploymentTarget: "15.0"
+    sources: [Sources]
+    settings:
+      CODE_SIGN_STYLE: Manual
+      PRODUCT_BUNDLE_IDENTIFIER: com.example.app
+      DEVELOPMENT_TEAM: XXXXXXX
+      CODE_SIGN_IDENTITY: "iPhone Distribution: ..."
+      PROVISIONING_PROFILE_SPECIFIER: XXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXX
+    info:
+      path: TestApp.xcodeproj/Info.plist
+      properties:
+        UILaunchScreen: {}
+"""
+    os.makedirs("Sources", exist_ok=True)
+    with open("Sources/Main.swift", "w") as f:
+        f.write("""import SwiftUI
+
+struct ContentView: View {
+    var body: some View {
+        VStack {
+            Image(systemName: "globe")
+                .imageScale(.large)
+                .foregroundStyle(.tint)
+            Text("Hello, world!")
+        }
+        .padding()
+    }
+}
+
+@main
+struct TestApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
+""")
+    print("Generated Sources/Main.swift")
+
+    with open("project.yml", "w") as f:
+        f.write(project_yml)
+    print("Generated project.yml")
+    subprocess.run(["xcodegen"], check=True)
+    sys.exit(0)
+
 if args.command == "open":
     subprocess.run(["open", "-a", "Simulator"], check=True)
     sys.exit(0)
-    
+
 parser.print_help()
