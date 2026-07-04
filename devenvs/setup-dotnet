@@ -4,6 +4,7 @@ su - amgdev <<'EOF'
     chmod +x dotnet-install.sh
     ./dotnet-install.sh --version latest
     rm dotnet-install.sh
-    echo 'export PATH=$PATH:/home/amgdev/.dotnet' >> $HOME/.bashrc
+    echo 'export PATH=$PATH:$HOME/.dotnet:$HOME/.dotnet/tools' >> $HOME/.bashrc
+    echo 'export DOTNET_ROOT=$HOME/.dotnet' >> $HOME/.bashrc
 EOF
 
