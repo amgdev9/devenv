@@ -6,5 +6,6 @@ su - amgdev <<'EOF'
     rm dotnet-install.sh
     echo 'export PATH=$PATH:$HOME/.dotnet:$HOME/.dotnet/tools' >> $HOME/.bashrc
     echo 'export DOTNET_ROOT=$HOME/.dotnet' >> $HOME/.bashrc
+    echo 'export DOTNET_ROLL_FORWARD=Major' >> $HOME/.bashrc
 EOF
 
