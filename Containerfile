@@ -23,6 +23,8 @@ RUN apt-get update \
         curl -fsSL https://opencode.ai/install | bash && \
         git config --global user.name 'AMG' && \
         git config --global user.email 'andresmargar98@proton.me' && \
+        git config --global push.autoSetupRemote true && \
+        git config --global pull.rebase true && \
         git config --global init.defaultBranch main && \
         git config --global credential.helper store && \
         mkdir workspace"
