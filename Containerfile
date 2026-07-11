@@ -5,6 +5,7 @@ RUN apt-get update \
     && mkdir -p /home/amgdev/.config \
     && mkdir -p /home/amgdev/.bin \
     && apt-get install -y git git-lfs curl gcc wget ripgrep tree-sitter-cli \
+    && apt-get install -y pipewire-bin --no-install-recommends \
     && wget https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz \
     && tar -xzvf nvim-linux-x86_64.tar.gz --strip-components=1 -C /usr/local \
     && rm nvim-linux-x86_64.tar.gz \
