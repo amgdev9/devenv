@@ -3,6 +3,7 @@ cd "$(dirname "$0")"
 ../setup-python
 
 # TODO Add MCP to opencode config and add symlink to blender
+# uv --directory $HOME/.bin/blender-mcp/mcp run blender-mcp
 su - amgdev <<'EOF'
     wget -O- https://ftp.nluug.nl/pub/graphics/blender/release/Blender5.2/blender-5.2.0-linux-x64.tar.xz | tar -xJ
     mv blender-5.2.0-linux-x64 /home/amgdev/.bin/blender
