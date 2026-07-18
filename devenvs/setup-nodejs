@@ -1,6 +1,8 @@
 #!/bin/bash
-su - amgdev -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash"
-su - amgdev -c "nvm install 25"
+su - amgdev -c "command -v nvm" &>/dev/null && exit 0
+
+su - amgdev -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.6/install.sh | bash"
+su - amgdev -c "nvm install 26"
 su - amgdev -c "npm i -g typescript typescript-language-server"
 su - amgdev -c "curl -fsSL https://get.pnpm.io/install.sh | sh -"
 cat <<EOF > /home/amgdev/.config/nvim-code/lua/custom/typescript.lua

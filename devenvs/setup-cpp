@@ -1,4 +1,6 @@
 #!/bin/bash
+su - amgdev -c "command -v clangd" &>/dev/null && exit 0
+
 apt-get install -y clang clangd
 cat <<EOF > /home/amgdev/.config/nvim-code/lua/custom/cpp.lua
 local M = {}

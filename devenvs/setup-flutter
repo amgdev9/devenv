@@ -1,4 +1,6 @@
 #!/bin/bash
+su - amgdev -c "command -v flutter" &>/dev/null && exit 0
+
 apt-get install -y zip unzip xz-utils libglu1-mesa
 wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.35.7-stable.tar.xz
 tar -xf flutter_linux_3.35.7-stable.tar.xz -C /opt

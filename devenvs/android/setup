@@ -1,4 +1,6 @@
 #!/bin/bash
+su - amgdev -c "command -v adb" &>/dev/null && exit 0
+
 cd "$(dirname "$0")"
 apt-get install -y unzip openjdk-21-jdk
 KOTLIN_LSP_VERSION=$(curl -s https://api.github.com/repos/Kotlin/kotlin-lsp/releases/latest | grep -Po '"name"\s*:\s*"v\K[^"]*')
@@ -31,7 +33,7 @@ su - amgdev <<'EOF'
     mv android ~/android-sdk/cmdline-tools/latest/bin  
 EOF
 cp lsp.lua /home/amgdev/.config/nvim-code/lua/custom/kotlin.lua 
-chown -R amgdev:amgdev /home/amgdev/.config/nvim-code/lua/custom/kotlin.lua 
+chown amgdev:amgdev /home/amgdev/.config/nvim-code/lua/custom/kotlin.lua 
 cp debug.lua /home/amgdev/.config/nvim-debugger/lua/custom/android.lua
-chown -R amgdev:amgdev /home/amgdev/.config/nvim-debugger/lua/custom/android.lua
+chown amgdev:amgdev /home/amgdev/.config/nvim-debugger/lua/custom/android.lua
 
