@@ -197,7 +197,16 @@ if args.command == "logs":
 
     try:
         if is_simulator:
-            subprocess.run(["xcrun", "simctl", "spawn", "booted", "log", "stream", "--style", "compact"], check=True)
+            simctl = subprocess.Popen(
+                ["xcrun", "simctl", "spawn", "booted", "log", "stream", "--style", "compact"],
+                stdout=subprocess.PIPE
+            )
+            target = subprocess.Popen(
+                ["lnav"],
+                stdin=simctl.stdout
+            )
+            if simctl.stdout: simctl.stdout.close()
+            target.wait()
         else:
             print("TODO Implement this")
         sys.exit(0)

@@ -170,11 +170,7 @@ if args.command == "deeplink":
 
 if args.command == "logs":
     try:
-        subprocess.run(["adb", "logcat", "-c"], check=True)
-        command = ["adb", "logcat", "-v", "color"]
-        if args.e:
-            command.append("*:E")
-        subprocess.run(command, check=True)
+        subprocess.run(["lazylogcat"], check=True)
         sys.exit(0)
     except KeyboardInterrupt:
         pass
