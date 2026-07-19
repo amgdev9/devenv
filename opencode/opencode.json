@@ -1,6 +1,13 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "lsp": false,
+  "mcp": {
+    "blender": {
+        "type": "local",
+        "command": ["uv", "--directory", "$HOME/.bin/blender-mcp/mcp", "run", "blender-mcp"],
+        "enabled": false
+    }
+  },
   "provider": {
     "openrouter": {
       "models": {

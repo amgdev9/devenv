@@ -2,10 +2,18 @@
 cd "$(dirname "$0")"
 ../setup-python
 
-# TODO Add MCP to opencode config and add symlink to blender
-# uv --directory $HOME/.bin/blender-mcp/mcp run blender-mcp
 su - amgdev <<'EOF'
     wget -O- https://ftp.nluug.nl/pub/graphics/blender/release/Blender5.2/blender-5.2.0-linux-x64.tar.xz | tar -xJ
-    mv blender-5.2.0-linux-x64 /home/amgdev/.bin/blender
+    mv blender-5.2.0-linux-x64 /home/amgdev/.bin/blender-data
+    ln -s /home/amgdev/blender-data/blender /home/amgdev/.bin/blender
     git clone --depth 1 https://projects.blender.org/lab/blender_mcp.git /home/amgdev/.bin/blender-mcp
+
+    python3 -c "
+    import json
+    with open('~/.config/opencode/opencode.json', 'r') as f:
+        data = json.load(f)
+    data['mcp']['blender']['enabled'] = True
+    with open('~/.config/opencode/opencode.json', 'w') as f:
+        json.dump(data, f, indent=2)
+    "
 EOF
