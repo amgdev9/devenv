@@ -2,20 +2,19 @@
 su - amgdev -c "command -v adb" &>/dev/null && exit 0
 
 cd "$(dirname "$0")"
-apt-get install -y unzip openjdk-21-jdk
+apt-get install -y unzip openjdk-21-jdk-headless
 su - amgdev <<'EOF'
     KOTLIN_LSP_VERSION=$(curl -s https://api.github.com/repos/Kotlin/kotlin-lsp/releases/latest | grep -Po '"name"\s*:\s*"v\K[^"]*')
-    curl -L -o kotlinlsp.tar.gz https://download-cdn.jetbrains.com/kotlin-lsp/$KOTLIN_LSP_VERSION/kotlin-server-$KOTLIN_LSP_VERSION.tar.gz
-    mkdir .kotlin-lsp
-    tar -xzf kotlinlsp.tar.gz -C .kotlin-lsp 
+    curl -L -o kotlinlsp.tar.gz https://download-cdn.jetbrains.com/language-server/kotlin-server/$KOTLIN_LSP_VERSION/kotlin-server-$KOTLIN_LSP_VERSION.tar.gz
+    tar -xzf kotlinlsp.tar.gz
     rm kotlinlsp.tar.gz
-    chmod u+x .kotlin-lsp/kotlin-server-$KOTLIN_LSP_VERSION/bin/intellij-server
-    mv .kotlin-lsp/kotlin-server-$KOTLIN_LSP_VERSION/bin/intellij-server .kotlin-lsp/kotlin-server-$KOTLIN_LSP_VERSION/bin/kotlin-lsp
-    echo 'export PATH=$PATH:$HOME/.kotlin-lsp/kotlin-server-$KOTLIN_LSP_VERSION/bin' >> ~/.bashrc
+    mv kotlin-server-$KOTLIN_LSP_VERSION ~/.bin/kotlin-server
+    echo "$HOME/.bin/kotlin-server/bin/intellij-server" > ~/.bin/kotlin-lsp
+    chmod u+x ~/.bin/kotlin-lsp
 
-    curl -o cmdtools.zip https://dl.google.com/android/repository/commandlinetools-linux-14742923_latest.zip
+    curl -o cmdtools.zip https://dl.google.com/android/repository/commandlinetools-linux-15859902_latest.zip
     unzip cmdtools.zip 
-    rm cmdtools.zip 
+    rm cmdtools.zip
     mkdir -p ~/android-sdk/cmdline-tools
     mv cmdline-tools ~/android-sdk/cmdline-tools/latest
 
@@ -25,17 +24,12 @@ su - amgdev <<'EOF'
     echo 'export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin' >> ~/.bashrc
     echo 'export PATH=$PATH:$ANDROID_HOME/platform-tools' >> ~/.bashrc
     
-    yes | ~/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
-    ~/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools"
+    ~/android-sdk/cmdline-tools/latest/bin/android sdk install platform-tools
 
-    curl https://dl.google.com/android/cli/latest/linux_x86_64/android --output android
-    chmod u+x android
-    mv android ~/android-sdk/cmdline-tools/latest/bin  
-
-    curl https://github.com/parfenovvs/lazylogcat/releases/download/v0.14.0/lazylogcat_0.14.0_darwin_amd64.tar.gz -L -o lazylogcat.tar.gz
+    curl https://github.com/parfenovvs/lazylogcat/releases/download/v0.14.0/lazylogcat_0.14.0_linux_amd64.tar.gz -L -o lazylogcat.tar.gz
     tar -xzf lazylogcat.tar.gz
     rm lazylogcat.tar.gz
-    mv lazylogcat ~/android-sdk/cmdline-tools/latest/bin
+    mv lazylogcat ~/.bin
 EOF
 cp lsp.lua /home/amgdev/.config/nvim-code/lua/custom/kotlin.lua 
 chown amgdev:amgdev /home/amgdev/.config/nvim-code/lua/custom/kotlin.lua 
