@@ -1,0 +1,32 @@
+#!/bin/bash
+su - amgdev -c "command -v kotlin" &>/dev/null && exit 0
+
+cd "$(dirname "$0")"
+apt-get install -y unzip openjdk-21-jdk-headless
+su - amgdev <<'EOF'
+    curl -fsSL https://kotl.in/install.sh | sh
+
+    KOTLIN_LSP_VERSION=$(curl -s https://api.github.com/repos/Kotlin/kotlin-lsp/releases/latest | grep -Po '"name"\s*:\s*"v\K[^"]*')
+    curl -L -o kotlinlsp.tar.gz https://download-cdn.jetbrains.com/language-server/kotlin-server/$KOTLIN_LSP_VERSION/kotlin-server-$KOTLIN_LSP_VERSION.tar.gz
+    tar -xzf kotlinlsp.tar.gz
+    rm kotlinlsp.tar.gz
+    mv kotlin-server-$KOTLIN_LSP_VERSION ~/.bin/kotlin-server
+    echo "$HOME/.bin/kotlin-server/bin/intellij-server" > ~/.bin/kotlin-lsp
+    chmod u+x ~/.bin/kotlin-lsp
+EOF
+cat <<EOF > /home/amgdev/.config/nvim-code/lua/custom/kotlin.lua
+local M = {}
+
+function M.setup_lsp(capabilities)
+  vim.lsp.config("kotlin_lsp", { capabilities = capabilities })
+  vim.lsp.enable("kotlin_lsp")
+end
+
+function M.get_formatters_by_ft()
+  return {}
+end
+
+return M
+EOF
+chown amgdev:amgdev /home/amgdev/.config/nvim-code/lua/custom/kotlin.lua 
+

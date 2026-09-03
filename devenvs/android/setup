@@ -2,16 +2,9 @@
 su - amgdev -c "command -v adb" &>/dev/null && exit 0
 
 cd "$(dirname "$0")"
-apt-get install -y unzip openjdk-21-jdk-headless
-su - amgdev <<'EOF'
-    KOTLIN_LSP_VERSION=$(curl -s https://api.github.com/repos/Kotlin/kotlin-lsp/releases/latest | grep -Po '"name"\s*:\s*"v\K[^"]*')
-    curl -L -o kotlinlsp.tar.gz https://download-cdn.jetbrains.com/language-server/kotlin-server/$KOTLIN_LSP_VERSION/kotlin-server-$KOTLIN_LSP_VERSION.tar.gz
-    tar -xzf kotlinlsp.tar.gz
-    rm kotlinlsp.tar.gz
-    mv kotlin-server-$KOTLIN_LSP_VERSION ~/.bin/kotlin-server
-    echo "$HOME/.bin/kotlin-server/bin/intellij-server" > ~/.bin/kotlin-lsp
-    chmod u+x ~/.bin/kotlin-lsp
+../setup-kotlin
 
+su - amgdev <<'EOF'
     curl -o cmdtools.zip https://dl.google.com/android/repository/commandlinetools-linux-15859902_latest.zip
     unzip cmdtools.zip 
     rm cmdtools.zip
@@ -31,8 +24,6 @@ su - amgdev <<'EOF'
     rm lazylogcat.tar.gz
     mv lazylogcat ~/.bin
 EOF
-cp lsp.lua /home/amgdev/.config/nvim-code/lua/custom/kotlin.lua 
-chown amgdev:amgdev /home/amgdev/.config/nvim-code/lua/custom/kotlin.lua 
 cp debug.lua /home/amgdev/.config/nvim-debugger/lua/custom/android.lua
 chown amgdev:amgdev /home/amgdev/.config/nvim-debugger/lua/custom/android.lua
 
