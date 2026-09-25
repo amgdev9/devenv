@@ -1,11 +1,7 @@
 #!/bin/bash
-[[ "$(uname)" != "Darwin" ]] && { echo "Error: This script can only be run on macOS."; exit 0; }
-
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew update
-brew tap luxmentis/tap https://codeberg.org/luxmentis/homebrew-tap
-brew trust luxmentis/tap
-brew install xcbeautify xcodes aria2 xcodegen xcede
+brew install xcode-build-server xcodes aria2 xcodegen sweetpad-dev/tap/sweetpad
 
 cd "$(dirname "$0")"
 cp lsp.lua $HOME/.config/nvim-code/lua/custom/swift.lua
