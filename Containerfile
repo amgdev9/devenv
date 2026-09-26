@@ -21,7 +21,7 @@ RUN apt-get update \
     && mkdir -p /home/amgdev/.config/opencode \
     && chown -R amgdev:amgdev /home/amgdev \
     && su - amgdev -c "\
-        curl -fsSL https://opencode.ai/install | bash && \
+        curl -fsSL https://opencode.ai/v2/install | bash && \
         git config --global user.name 'AMG' && \
         git config --global user.email 'andresmargar98@proton.me' && \
         git config --global push.autoSetupRemote true && \
