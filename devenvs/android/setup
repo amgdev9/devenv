@@ -19,6 +19,8 @@ su - amgdev <<'EOF'
     
     ~/android-sdk/cmdline-tools/latest/bin/android sdk install platform-tools
 
+    android sdk install build/lightbuild/0.0.30 && bash "$(android info sdk)/build/lightbuild/0.0.30/cli/install.sh"
+
     curl https://github.com/parfenovvs/lazylogcat/releases/download/v0.14.0/lazylogcat_0.14.0_linux_amd64.tar.gz -L -o lazylogcat.tar.gz
     tar -xzf lazylogcat.tar.gz
     rm lazylogcat.tar.gz
