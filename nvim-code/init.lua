@@ -14,7 +14,6 @@ require("lazy").setup({
 
   -- Coding
   { "antosha417/nvim-lsp-file-operations" },
-  { "Exafunction/windsurf.nvim" },
   { "stevearc/conform.nvim" },
   { "ThePrimeagen/harpoon", branch = "harpoon2" },
   { "hrsh7th/nvim-cmp" },
@@ -33,7 +32,6 @@ require("file-explorer")
 
 -- Coding config
 require("git-gutter")
-require("ai")
 require("format")
 require("autocomplete")
 require("lsp")
