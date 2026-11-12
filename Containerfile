@@ -6,7 +6,7 @@ RUN apt-get update \
     && mkdir -p /home/amgdev/.bin \
     && apt-get install -y git git-lfs curl gcc wget ripgrep nodejs unzip \
     && apt-get install -y pipewire-bin --no-install-recommends \
-    && wget https://github.com/tree-sitter/tree-sitter/releases/download/latest/tree-sitter-cli-linux-x64.zip \
+    && wget https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-cli-linux-x64.zip \
     && unzip tree-sitter-cli-linux-x64.zip \
     && mv tree-sitter /home/amgdev/.bin \
     && rm tree-sitter-cli-linux-x64.zip \
