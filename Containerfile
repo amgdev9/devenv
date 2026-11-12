@@ -4,8 +4,12 @@ RUN apt-get update \
     && useradd -m -s /bin/bash amgdev \
     && mkdir -p /home/amgdev/.config \
     && mkdir -p /home/amgdev/.bin \
-    && apt-get install -y git git-lfs curl gcc wget ripgrep tree-sitter-cli \
+    && apt-get install -y git git-lfs curl gcc wget ripgrep nodejs unzip \
     && apt-get install -y pipewire-bin --no-install-recommends \
+    && wget https://github.com/tree-sitter/tree-sitter/releases/download/latest/tree-sitter-cli-linux-x64.zip \
+    && unzip tree-sitter-cli-linux-x64.zip \
+    && mv tree-sitter /home/amgdev/.bin \
+    && rm tree-sitter-cli-linux-x64.zip \
     && wget https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz \
     && tar -xzvf nvim-linux-x86_64.tar.gz --strip-components=1 -C /usr/local \
     && rm nvim-linux-x86_64.tar.gz \
@@ -16,7 +20,6 @@ RUN apt-get update \
     && cp -f /home/amgdev/devenv/.bashrc /home/amgdev/.bashrc \
     && cp -f /home/amgdev/devenv/.inputrc /home/amgdev/.inputrc \
     && mv /home/amgdev/devenv/devenvs /root \
-    && mkdir -p /home/amgdev/.cache/nvim-code/codeium \
     && mkdir -p /home/amgdev/.local/share/opencode \
     && mkdir -p /home/amgdev/.config/opencode \
     && chown -R amgdev:amgdev /home/amgdev \
@@ -30,9 +33,9 @@ RUN apt-get update \
         git config --global credential.helper store && \
         mkdir workspace"
 
-COPY windsurf.json /home/amgdev/.cache/nvim-code/codeium/config.json
 COPY .git-credentials /home/amgdev/.git-credentials
 COPY opencode-auth.json /home/amgdev/.local/share/opencode/auth.json
+
 USER amgdev 
 WORKDIR /home/amgdev/workspace
 CMD ["bash"]
