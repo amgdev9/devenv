@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# To compile rust for iOS on Linux (dylib, static libs do not need anything else):
+#
+# .cargo/config.toml
+# [target.aarch64-apple-ios]
+# linker = "rust-lld"
+#
+# - Install Xcode using `xtool sdk install Xcode.xip`
+# - Compile with `cargo build --target aarch64-apple-ios`
+
+cd "$(dirname "$0")"
+
+su - amgdev -c "command -v xtool" &>/dev/null && exit 0
+
+./setup-swift
+
+curl -fL \
+  "https://github.com/xtool-org/xtool/releases/latest/download/xtool-$(uname -m).AppImage" \
+  -o xtool
+chmod +x xtool
+./xtool --appimage-extract
+rm xtool
+mv squashfs-root /home/amgdev/.bin/xtool-data
+ln -s /home/amgdev/.bin/xtool-data/AppRun /home/amgdev/.bin/xtool
+
+# xcrun shim needed for rust
+echo -e "#!/bin/bash\necho /home/amgdev/.swiftpm/swift-sdks/darwin.artifactbundle/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk" > /home/amgdev/.bin/xcrun
+chmod +x /home/amgdev/.bin/xcrun
