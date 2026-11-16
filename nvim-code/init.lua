@@ -20,6 +20,7 @@ require("lazy").setup({
   { "hrsh7th/cmp-nvim-lsp" },
   { "nvim-mini/mini.diff" },
   { "neovim/nvim-lspconfig" },
+  { "huggingface/llm.nvim" },
 })
 
 -- Common config
