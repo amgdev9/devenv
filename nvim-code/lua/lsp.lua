@@ -77,3 +77,9 @@ vim.lsp.log.set_format_func(function(entry)
         return "\n" .. entry
     end
 end)
+
+vim.api.nvim_create_user_command("LspLog", function()
+  vim.cmd("edit " .. vim.fn.fnameescape(vim.lsp.log.get_filename()))
+end, {
+  desc = "Open LSP log file",
+})
