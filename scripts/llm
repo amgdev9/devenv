@@ -1,0 +1,2 @@
+#!/bin/bash
+llama server --fim-qwen-1.5b-default
