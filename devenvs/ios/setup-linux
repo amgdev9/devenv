@@ -15,6 +15,7 @@ su - amgdev -c "command -v xtool" &>/dev/null && exit 0
 
 ./setup-swift
 
+su - amgdev <<'EOF'
 curl -fL \
   "https://github.com/xtool-org/xtool/releases/latest/download/xtool-$(uname -m).AppImage" \
   -o xtool
@@ -27,3 +28,4 @@ ln -s /home/amgdev/.bin/xtool-data/AppRun /home/amgdev/.bin/xtool
 # xcrun shim needed for rust
 echo -e "#!/bin/bash\necho /home/amgdev/.swiftpm/swift-sdks/darwin.artifactbundle/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk" > /home/amgdev/.bin/xcrun
 chmod +x /home/amgdev/.bin/xcrun
+EOF
